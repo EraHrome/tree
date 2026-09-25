@@ -2,186 +2,405 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Родословная Полковникова Никиты Андреевича</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Родословная Полковниковых</title>
 <style>
-  @page { size: A3 landscape; margin: 12mm; }
+  :root {
+    --paper: #f3eee6;
+    --ink: #2c261f;
+    --muted: #6e6256;
+    --line: #8d7360;
+    --link: #124ea0;
+    --pat: #e7f0fa;
+    --pat-edge: #2a568c;
+    --mat: #e6f3e7;
+    --mat-edge: #2e6e40;
+    --self: #5c4028;
+    --war: #fff1e6;
+    --war-edge: #a04820;
+    --sib: #fff8e8;
+    --sib-edge: #a87624;
+  }
   * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
   body {
-    margin: 0;
-    font-family: "Segoe UI", "Times New Roman", sans-serif;
-    color: #1c2430;
-    background: #f7f4ee;
+    font-family: "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: var(--paper);
   }
-  h1 {
-    margin: 0 0 2mm;
-    font-size: 22px;
-    font-weight: 650;
-    letter-spacing: 0.02em;
-  }
-  .sub {
-    margin: 0 0 6mm;
-    color: #5c6778;
-    font-size: 12px;
-  }
-  .legend { display: flex; gap: 8mm; margin-bottom: 5mm; font-size: 11px; }
-  .legend span::before {
-    content: "";
-    display: inline-block;
-    width: 10px; height: 10px;
-    margin-right: 4px;
-    border-radius: 2px;
-    vertical-align: -1px;
-  }
-  .legend .p::before { background: #1e4d7b; }
-  .legend .m::before { background: #1f6b4a; }
-  .legend .s::before { background: #8a5a12; }
-  .tree { display: flex; flex-direction: column; align-items: center; gap: 0; }
-  .row { display: flex; justify-content: center; gap: 8mm; width: 100%; }
-  .couple { display: flex; gap: 3mm; align-items: stretch; }
-  .branch { display: flex; flex-direction: column; align-items: center; }
-  .card {
-    border: 1px solid #d7d0c4;
-    border-top: 4px solid #8a5a12;
-    background: #fff;
-    border-radius: 6px;
-    padding: 2.2mm 3mm 2.4mm;
-    min-width: 52mm;
-    max-width: 68mm;
-    box-shadow: 0 1px 0 rgba(0,0,0,.04);
-  }
-  .card.pat { border-top-color: #1e4d7b; }
-  .card.mat { border-top-color: #1f6b4a; }
-  .card.self { border-top-color: #8a5a12; background: #fffaf2; }
-  .name { font-size: 12px; font-weight: 700; line-height: 1.25; }
-  .meta { margin-top: 1mm; font-size: 10px; line-height: 1.3; color: #3e4a5c; }
-  .side {
-    margin-top: 1.4mm;
-    font-size: 9.5px;
-    line-height: 1.3;
-    color: #5c6778;
-  }
-  .link {
-    width: 1px;
-    height: 5mm;
-    background: #b7b1a6;
-  }
-  .parents {
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
     display: flex;
-    gap: 14mm;
-    justify-content: center;
-    position: relative;
+    flex-wrap: wrap;
+    gap: 12px 20px;
+    align-items: center;
+    padding: 14px 22px;
+    background: rgba(243, 238, 230, 0.94);
+    border-bottom: 1px solid #e0d5c6;
   }
-  .note {
-    margin-top: 6mm;
-    font-size: 10px;
-    color: #5c6778;
-    line-height: 1.4;
+  h1 { font-size: 20px; margin: 0; font-weight: 650; }
+  header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  .tools { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  button, .tools label {
+    font: inherit;
+    font-size: 13px;
+    border: 1px solid #cbbba8;
+    background: #fff;
+    color: var(--ink);
+    border-radius: 8px;
+    padding: 6px 10px;
+    cursor: pointer;
   }
-  .cols { display: flex; gap: 8mm; align-items: flex-start; }
-  .col { flex: 1; }
-  .col h2 {
-    margin: 0 0 3mm;
-    font-size: 14px;
-    font-weight: 700;
+  button:hover { background: #fffaf3; }
+  #viewport { height: calc(100% - 74px); overflow: auto; padding: 28px 24px 80px; }
+  #canvas { transform-origin: top left; width: max-content; }
+  .node { display: flex; align-items: flex-start; }
+  .pair { display: flex; flex-direction: column; position: relative; margin-left: 18px; }
+  .prow { position: relative; display: flex; align-items: flex-start; padding: 8px 0 8px 18px; }
+  .prow::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 2px;
+    background: var(--line);
   }
-  .col.pat h2 { color: #1e4d7b; }
-  .col.mat h2 { color: #1f6b4a; }
-  .stack { display: flex; flex-direction: column; align-items: center; }
-  .pair-row { display: flex; gap: 3mm; justify-content: center; }
-  .gen { margin-bottom: 1mm; }
+  .prow:first-child::before { top: 36px; bottom: 0; }
+  .prow:last-child::before { top: 0; height: 36px; }
+  .prow:only-child::before { display: none; }
+  .prow::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 36px;
+    width: 18px;
+    height: 2px;
+    background: var(--line);
+  }
+  .prow:only-child::after { width: 18px; }
+  .anc-line { width: 22px; height: 2px; background: var(--line); flex: none; margin-top: 36px; }
+  .card {
+    width: 230px;
+    background: #fff;
+    border: 2px solid #c8b8a6;
+    border-radius: 12px;
+    padding: 10px 12px 8px;
+    box-shadow: 0 1px 0 rgba(60, 40, 20, 0.04);
+  }
+  .card.pat { background: var(--pat); border-color: var(--pat-edge); }
+  .card.mat { background: var(--mat); border-color: var(--mat-edge); }
+  .card.self { background: var(--self); border-color: var(--self); color: #fff; }
+  .card.war { background: var(--war); border-color: var(--war-edge); }
+  .card .sur { font-weight: 700; font-size: 14px; line-height: 1.25; }
+  .card a.sur { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
+  .card.self a.sur { color: #d6e6ff; }
+  .card .given, .card .meta, .card .note { font-size: 12px; line-height: 1.35; color: var(--muted); margin-top: 2px; }
+  .card.self .given, .card.self .meta, .card.self .note { color: rgba(255,255,255,0.88); }
+  .card .actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  .card button, .card summary {
+    font-size: 12px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    border: 1px solid #d7c7b6;
+    background: rgba(255,255,255,0.7);
+    color: var(--ink);
+    list-style: none;
+    cursor: pointer;
+  }
+  .card.self button { color: var(--ink); }
+  details.sibs summary { display: inline-block; }
+  details.sibs summary::-webkit-details-marker { display: none; }
+  .sib-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .sib {
+    background: var(--sib);
+    border: 1px solid var(--sib-edge);
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  .sib a { color: var(--link); }
+  .legend { display: flex; gap: 10px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; border: 2px solid; }
+  dialog {
+    width: min(640px, calc(100% - 32px));
+    border: none;
+    border-radius: 14px;
+    padding: 22px 24px 18px;
+    color: var(--ink);
+    box-shadow: 0 16px 50px rgba(40, 24, 8, 0.25);
+  }
+  dialog::backdrop { background: rgba(40, 28, 16, 0.35); }
+  dialog h2 { margin: 0 0 8px; font-size: 20px; }
+  dialog h3 { margin: 16px 0 4px; font-size: 14px; }
+  dialog p { margin: 0 0 6px; font-size: 14px; line-height: 1.45; }
+  dialog a { color: var(--link); }
+  dialog menu { margin: 16px 0 0; padding: 0; text-align: right; }
 </style>
 </head>
 <body>
-  <h1>Родословная Полковникова Никиты Андреевича</h1>
-  <p class="sub">Собрано по семейным сведениям. Годы Ходыревых без отдельно названной даты взяты из подтверждённой карточки.</p>
+<header>
+  <div>
+    <h1>Родословная Полковниковых</h1>
+    <p>Слева вы, справа предки. Синяя фамилия подчёркнута — карточку можно открыть. В скобках девичья фамилия.</p>
+  </div>
   <div class="legend">
-    <span class="p">линия отца</span>
-    <span class="m">линия матери</span>
-    <span class="s">Никита</span>
+    <span><i class="sw" style="background:var(--pat);border-color:var(--pat-edge)"></i>по отцу</span>
+    <span><i class="sw" style="background:var(--mat);border-color:var(--mat-edge)"></i>по матери</span>
+    <span><i class="sw" style="background:var(--war);border-color:var(--war-edge)"></i>воевал</span>
+    <span><i class="sw" style="background:var(--self);border-color:var(--self)"></i>вы</span>
   </div>
-
-  <div class="cols">
-    <div class="col pat">
-      <h2>Отец — Полковниковы и Ходыревы</h2>
-      <div class="stack">
-        <div class="pair-row gen">
-          <div class="card pat"><div class="name">Ходырев Василий Григорьевич</div><div class="meta">1875</div></div>
-          <div class="card pat"><div class="name">Киселева Анастасия Константиновна</div><div class="meta">1883, Кислино</div></div>
-          <div class="card pat"><div class="name">Ходырев Иван Григорьевич</div><div class="meta">1883</div></div>
-          <div class="card pat"><div class="name">Зайцева Мария Платоновна</div><div class="meta">1885</div></div>
-        </div>
-        <div class="link"></div>
-        <div class="pair-row gen">
-          <div class="card pat">
-            <div class="name">Ходырев Александр Васильевич</div>
-            <div class="meta">1908, Новое Перевесово<br>умер 6 июня 1996</div>
-          </div>
-          <div class="card pat">
-            <div class="name">Ходырева Наталья Ивановна</div>
-            <div class="meta">1911, Новое Перевесово<br>умерла в 1994</div>
-          </div>
-        </div>
-        <div class="link"></div>
-        <div class="pair-row gen">
-          <div class="card pat">
-            <div class="name">Полковников Николай Николаевич</div>
-            <div class="meta">1934, село Благодать,<br>Ефремовский район</div>
-            <div class="side">отец: Николай</div>
-          </div>
-          <div class="card pat">
-            <div class="name">Ходырева Анна Александровна</div>
-            <div class="meta">1938, Новое Перевесово<br>умерла 24 февраля 2025</div>
-            <div class="side">сёстры: Щербинина Анастасия Александровна (1934); Мартынова Надежда Александровна</div>
-          </div>
-        </div>
-        <div class="link"></div>
-        <div class="card pat">
-          <div class="name">Полковников Андрей Николаевич</div>
-          <div class="meta">16 мая 1970, Ефремов — место неточно</div>
-          <div class="side">брат: Полковников Сергей Николаевич</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="col mat">
-      <h2>Мать — Демченко, Гузии, Коровкины</h2>
-      <div class="stack">
-        <div class="pair-row gen">
-          <div class="card mat"><div class="name">Демченко Леонид</div></div>
-          <div class="card mat"><div class="name">Демченко Мария</div></div>
-          <div class="card mat"><div class="name">Гузий Юхим</div><div class="meta">также Ефим</div></div>
-          <div class="card mat"><div class="name">Коровкин Степан</div><div class="meta">служил во Вторую мировую</div></div>
-          <div class="card mat"><div class="name">Химка</div><div class="meta">Евфимия или Юхимия</div></div>
-        </div>
-        <div class="link"></div>
-        <div class="pair-row gen">
-          <div class="card mat">
-            <div class="name">Демченко Валерий Леонидович</div>
-            <div class="meta">родился в Славгороде</div>
-            <div class="side">брат: Игорь Леонидович, дети Ольга и Алексей Демченко<br>сестра: Людмила Леонидовна, дочь Яна</div>
-          </div>
-          <div class="card mat">
-            <div class="name">Гузий Надежда Викторовна</div>
-            <div class="meta">родилась в Славгороде</div>
-            <div class="side">отец: Гузий Виктор Юхимович, Славгород<br>мать: Коровкина Лидия Степановна</div>
-          </div>
-        </div>
-        <div class="link"></div>
-        <div class="card mat">
-          <div class="name">Демченко Руслана Валерьевна</div>
-          <div class="meta">6 марта 1974, Славгород,<br>Синельниковский район, Украина</div>
-        </div>
-      </div>
-    </div>
+  <div class="tools">
+    <button type="button" id="zoom-out">−</button>
+    <button type="button" id="zoom-in">+</button>
+    <button type="button" id="zoom-reset">100%</button>
+    <button type="button" id="toggle-sibs">Братья и сёстры</button>
   </div>
+</header>
+<div id="viewport"><div id="canvas"></div></div>
+<dialog id="war">
+  <h2 id="war-title"></h2>
+  <div id="war-body"></div>
+  <menu><button type="button" id="war-close">Закрыть</button></menu>
+</dialog>
+<script>
+const wars = {
+  stepan: {
+    title: "Коровкин Степан Петрович",
+    html: `
+      <h3>Кто это</h3>
+      <p>Отец Лидии Степановны Гузий, урождённой Коровкиной, и Николай Степановича. Родился в 1898 году, день и месяц в карточке не указаны. Отец по отчеству — Пётр. Место рождения: пгт Славгород, Синельниковский район, Днепропетровская область.</p>
+      <h3>Служба</h3>
+      <p>Призван Синельниковским РВК. На службу поступил 20 июля 1941 года. Звание — ефрейтор. В боях был в 12-й стрелковой дивизии, 434-м стрелковом полку. Получил два ранения. Военно-медицинская комиссия признала его годным к нестроевой службе. С 9 июля 1942 года — стрелок взвода охраны и обороны 140-го отдельного дорожно-эксплуатационного батальона ордена Красной Звезды, Южная группа войск.</p>
+      <h3>Дунай, январь 1945</h3>
+      <p>В представлении к награде: высокие боевые качества показал в упорных боях в январе 1945 года за рекой Дунай. Примером храбрости и стойкости — на охране и обороне переправы через Дунай в городе Дунафёльдвар, Венгрия. К службе относился безупречно, имел несколько благодарностей.</p>
+      <h3>Награды</h3>
+      <p>Медаль «За отвагу». Приказ Южной группы войск № 17/н от 16 июля 1945 года. Архив: ЦАМО, фонд 33, опись 690306, дело 3126. На сводной карточке медаль помечена дважды. Примером храбрости назван один приказ, второго приказа с другой датой нет.</p>
+      <p>Орден Отечественной войны II степени, документ № 79 от 6 апреля 1985 года. Это юбилейное награждение к 40-летию Победы, не боевой приказ 1945 года.</p>
+      <p>Орден Красной Звезды в наградном списке — награда батальона, не его личная.</p>
+      <p><a href="https://pamyat-naroda.ru/heroes/person-hero36952476/" target="_blank" rel="noopener">Карточка на «Памяти народа»</a><br>
+      <a href="https://pamyat-naroda.ru/heroes/podvig-chelovek_nagrazhdenie43992838/" target="_blank" rel="noopener">Приказ о медали «За отвагу»</a></p>`
+  },
+  nikolai: {
+    title: "Коровкин Николай Степанович",
+    html: `
+      <h3>Кто это</h3>
+      <p>Родился 3 января 1925 года в пгт Славгород. Та же фамилия, отчество и село, что у Лидии Степановны. Отдельной метрической записи о том, что он её брат, нет: родство вероятное.</p>
+      <h3>Служба</h3>
+      <p>Призван 10 октября 1943 года Раздорским РВК Ростовской области. Звания: красноармеец, младший сержант, командир отделения. Части: 531-й миномётный полк, 104-й отдельный ремонтно-восстановительный батальон, 2-я инженерно-сапёрная бригада.</p>
+      <h3>Апрель 1945</h3>
+      <p>25 апреля 1945 года под огнём устранил 15 порывов линии связи, чтобы огонь мог продолжаться. 27 апреля 1945 года участвовал в бою и личным оружием уничтожил двух солдат.</p>
+      <h3>Награды</h3>
+      <p>Медаль «За отвагу», приказ 531-го миномётного полка № 4/н от 9 мая 1945 года. ЦАМО, фонд 33, опись 690306, дело 2592.</p>
+      <p>Медаль «За победу над Германией», 9 мая 1945 года. ЦАМО, фонд 121, опись 12936, дело 123.</p>
+      <p>Отдельная карточка юбилейного ордена Отечественной войны II степени на то же имя, 1925 год, Славгород. Внутри шести документов личной карточки этого ордена нет.</p>
+      <h3>1950 год</h3>
+      <p>Дата 13 июня 1950 года стоит в поле «Дата окончания службы» документа «Учётно-послужная картотека» на странице человека. Отдельный приказ об увольнении не открывался.</p>
+      <p><a href="https://pamyat-naroda.ru/heroes/person-hero85388780/" target="_blank" rel="noopener">Карточка на «Памяти народа»</a><br>
+      <a href="https://pamyat-naroda.ru/heroes/podvig-chelovek_nagrazhdenie40473657/" target="_blank" rel="noopener">Приказ о медали «За отвагу»</a></p>`
+  },
+  petr: {
+    title: "Зотов Пётр Филиппович",
+    html: `
+      <h3>Кто это</h3>
+      <p>Брат Натальи Филипповны Зотовой по семейным сведениям. Наиболее близкая открытая карточка: родился в 1909 году; в данных карточки место рождения — Тульская обл., Октябрьский р-н, д. Кобылинка (деревня прихода села Благодать). На сводке сайта район указан без деревни; деревня есть в скрытом поле bPlace. Полное совпадение с семьёй ещё не доказано: совпадают фамилия, отчество и район Благодати.</p>
+      <h3>Служба</h3>
+      <p>Призван 1 июля 1941 года Таганским РВК города Москвы. В батарее с августа 1941. Звания: гвардии младший сержант, гвардии сержант. Должности по листам: командир автоустановки 1-й батареи 6-го гвардейского миномётного полка; позже командир орудия 6 ГМП. Фронты в сводке: Брянский, 15-й стрелковый корпус, 1-й Белорусский.</p>
+      <h3>Медаль «За отвагу», 18.07.1942</h3>
+      <p>Представление: твёрдый, дисциплинированный боец; бережёт матчасть. В начале декабря 1941 при огневых налётах по деревне Платоновка ОП батареи обстреливался миномётами противника — сохранил спокойствие и точно отдавал команды подчинённым. Заключение опергруппы ГМЧ Брянского фронта от 25 апреля 1942: достоин медали «За отвагу».</p>
+      <h3>Орден Отечественной войны II степени, 19.07.1943</h3>
+      <p>11 июля 1943 под непрерывным огнём произвёл шесть огневых налётов. В тот же день при наступлении противника в районе высоты 233,6 вывел орудие на открытую огневую позицию под артминомётным огнём: уничтожил до 40 солдат и поджёг один танк; потерь в расчёте и технике не допустил. Представление командира 6 ГМП гв. майора Мурзаева от 14 июля 1943.</p>
+      <h3>Медаль «За боевые заслуги», 15.09.1944</h3>
+      <p>Дата по сводке карточки; текст этого наградного листа ещё не разобран.</p>
+      <p>В карточке семь документов (награды + строки картотеки). Родство с Натальей Филипповной по открытым источникам отдельно не подтверждено.</p>
+      <p><a href="https://pamyat-naroda.ru/heroes/person-hero30651729/" target="_blank" rel="noopener">Карточка на «Памяти народа»</a><br>
+      <a href="https://pamyat-naroda.ru/heroes/podvig-chelovek_nagrazhdenie10682946/" target="_blank" rel="noopener">Медаль «За отвагу»</a><br>
+      <a href="https://pamyat-naroda.ru/heroes/podvig-chelovek_nagrazhdenie16499385/" target="_blank" rel="noopener">Орден Отечественной войны II степени</a><br>
+      <a href="https://pamyat-naroda.ru/heroes/podvig-chelovek_nagrazhdenie46641964/" target="_blank" rel="noopener">Медаль «За боевые заслуги»</a></p>`
+  }
+};
 
-  <div class="stack" style="margin-top: 4mm;">
-    <div class="link"></div>
-    <div class="card self">
-      <div class="name">Полковников Никита Андреевич</div>
-      <div class="meta">5 августа 1999, Ефремов, Тульская область</div>
-    </div>
-  </div>
-  <p class="note">Славгород — посёлок Синельниковского района Днепропетровской области. Благодать и Новое Перевесово — у Ефремова. Отчества Игоря, Людмилы и Лидии поставлены по именам отцов. Девичья фамилия Марии Демченко и полное имя Химки неизвестны.</p>
+function person(surname, given, meta, kind, url, note, sibs, parents, war) {
+  return { surname, given, meta, kind, url: url || "", note: note || "", sibs: sibs || [], parents: parents || [], war: war || "" };
+}
+function sib(surname, given, meta, url, war) {
+  return { surname, given, meta, url: url || "", war: war || "" };
+}
+
+const tree = person(
+  "Полковников", "Никита Андреевич", "05.08.1999, Ефремов", "self", "", "", [],
+  [
+    person("Полковников", "Андрей Николаевич", "16.05.1970, Ефремов", "pat", "", "", [
+      sib("Полковников", "Сергей Николаевич", "брат Андрея", "")
+    ], [
+      person("Полковников", "Николай Николаевич", "1934, село Благодать", "pat", "", "", [
+        sib("Полковников", "Алексей Николаевич", "брат Николая Николаевича", ""),
+        sib("Полковников", "Владимир Николаевич", "брат Николая Николаевича", "")
+      ], [
+        person("Полковников", "Николай", "отец Николая Николаевича; отчество возможно Фомин", "pat", "", "Гипотеза: сын Фомы Петрова Полковникова (ок. 1858–16.03.1906, Благодать; жена в 1880–1884 — Матрёна Севастианова). Дети Фомы по метрикам/индексу: Евдокия (ум. 08.08.1879, новорожд.); Павел (ум. 20.04.1880, 1 год); Екатерина (1880), Дария (1883), Анна (1884); Василий (ум. 01.08.1896, 7 лет, род. ок. 1889); Григорий Фомин (ум. 25.12.1909, 18 лет); Николай Фомин (ум. 27.03.1909, 9 лет) — оба в книге умерших Благодати 1909, отец Фома Петров; Павел Фомин (род. ок. 1893), брак 26.05.1913 с Анастасией Максимовой Качаевой, Ефремовский уезд — единственный пока живой сын-кандидат после 1909, но он Павел, не Николай. Живого Николая Фомина, годного быть отцом Николая Николаевича (1934), в индексе Тульских метрик нет. Фома в древо как предок пока не включён.", []),
+        person("Полковникова (Зотова)", "Наталья Филипповна", "мать Николая Николаевича", "mat", "", "Девичья фамилия Зотова. Год рождения пока неизвестен. По списку прихожан ~1910 (ВГД): Зотовы — жители д. Кабылинка/Кобылинка (ныне Кытино) прихода Покровской ц. с. Благодать; Полковниковы — в самом селе Благодать. Приход (naritg10/t21): Благодать, Заполье, Трасна, Кобылинка, Фёдоровка. В индексе FS: «Наталия Филиппова Зотова», брак 26.01.1896 с Казимировым — другая; «Наталия Иоаннова Зотова» брак 13.04.1914 с Григорием Феодуловым Афониным — тоже другая (отчество Иоаннова; Афонины есть в селе Благодать). Рождение Натальи/Петра ~1909 и брак с Полковниковым в индексе не найдены. Каталог nashipredki Благодать 1863–1915: 100% индексации — DGS 007563501 (рождения 1879–1884) и 007564560 (смерти 1873–1882, 1885); 0% — 1900 (007564221), 1909 (007564447), 1915 (007564763) и большинство остальных; отдельно общий том 1904 DGS 007563391. Форум naritg10/t498 «Кобылинка. Жители» — только Никитин 1904, Зотовых нет. Не путать с Кобылинкой Богородицкого у. (Успенское) и Кабылинкой Усманского у. (Тамбов). Открытый веб по «Филипп Зотов» + Ефремов/Кобылинка/Кытино — пусто. После ~1918 — ЗАГС.", [
+          sib("Зотов", "Пётр Филиппович", "брат Натальи; воевал", "https://pamyat-naroda.ru/heroes/person-hero30651729/", "petr")
+        ], [
+          person("Зотов", "Филипп", "отец Натальи и Петра по отчеству", "pat", "", "Имя по отчеству детей. Фамилия Зотов в Кабылинке прихода Благодать подтверждена списком жителей ~1910 (ВГД). В индексе FS есть «Филипп Зотов» †22.01.1855, ~63 лет (ark 6TBZ-FZK8) — слишком ранний, не наш. «Петр Зотов» + отец Филипп + рождение 1905–1915 + Тула: в топе нет Филиппова (плёнка 1909 не индексирована). Приоритет: сплошной просмотр плёнок Благодати 1900/1904/1909/1915 и индексированных 1879–1884; затем ЗАГС.", [])
+        ])
+      ]),
+      person("Полковникова (Ходырева)", "Анна Александровна", "1938–24.02.2025, Новое Перевесово", "mat", "https://familio.org/persons/8b0676ac-799b-4c21-8b22-4ac1d13f1610", "", [
+        sib("Щербинина (Ходырева)", "Анастасия Александровна", "1934–2022", "https://familio.org/persons/4fafd3d2-81dc-4eee-a0ae-d07a3dbae656"),
+        sib("Мартынова (Ходырева)", "Надежда Александровна", "сестра Анны", "")
+      ], [
+        person("Ходырев", "Александр Васильевич", "1908–1996, Новое Перевесово", "pat", "https://familio.org/persons/2e1be95a-67f3-4a65-b1b7-9f8634b5c446", "Умер 6 июня 1996 года.", [
+          sib("Ходырев", "Михаил Васильевич", "1903", "https://familio.org/persons/ac4e170d-95a4-4916-bcbb-c920ffda15d2"),
+          sib("Ходырев", "Алексей Васильевич", "1905", "https://familio.org/persons/584ac669-3b09-4a96-bb18-b7f1e8e18831"),
+          sib("Ходырева", "Мария Васильевна", "1910", "https://familio.org/persons/0927f7b1-a3e8-4de5-8e94-28006981e321"),
+          sib("Ходырев", "Дмитрий Васильевич", "1912", "https://familio.org/persons/9fbb0caf-f3af-4c69-b94c-0f9bacc4caab")
+        ], [
+          person("Ходырев", "Василий Григорьевич", "1875, Новое Перевесово", "pat", "https://familio.org/persons/3b0f7eab-c69a-4355-8489-a82959579086", "", [
+            sib("Ходырев", "Николай Григорьевич", "1862", "https://familio.org/persons/19dc98d0-9318-46c7-b0d6-19d10f22542b"),
+            sib("Ходырев", "Терентий Григорьевич", "1865", "https://familio.org/persons/b9794ed3-f0ca-4012-9ec2-16d302be40be"),
+            sib("Чурсина (Ходырева)", "Мария Григорьевна", "1870", "https://familio.org/persons/3f348b7c-239d-463c-bf63-69f0f766e79a"),
+            sib("Маринкова (Ходырева)", "Вера Григорьевна", "1872–1896", "https://familio.org/persons/d9cd54e2-2e5d-4e36-92ab-c5cd45482162"),
+            sib("Ходырева", "Елена Григорьевна", "1883", "https://familio.org/persons/eaa3c76e-227d-41a7-8722-df2a30c45d6e")
+          ], [
+            person("Ходырев", "Григорий Ефимович", "1839–1886, Новое Перевесово", "pat", "https://familio.org/persons/afc75b5f-0bc9-4fa8-9fcf-3a2e02ab13c1", "Родители в карточке не указаны.", []),
+            person("Ходырева (Молчанова)", "Дарья Кузьминична", "1844, Верхний Изрог", "mat", "https://familio.org/persons/65d65ddb-71c1-4757-ac2a-cf63d55fb338", "", [], [
+              person("Молчанов", "Кузьма Васильевич", "1824, Верхний Изрог", "pat", "https://familio.org/persons/19d28e5b-fd18-471f-829d-a7aff536a222", "", [], [
+                person("Молчанов", "Василий Васильевич", "1793–1854, Верхний Изрог", "pat", "https://familio.org/persons/d7c06cfa-fdf8-4eab-8b49-d3a89f8a77d9", "Родители скрыты настройками приватности.", []),
+                person("Молчанова", "Фёкла Ивановна", "1790–1849", "mat", "https://familio.org/persons/f3a882ac-7915-4d1d-8ef6-5e153a1e0efc", "Родители не указаны.", [])
+              ]),
+              person("Молчанова (Кудрявцева)", "Агриппина Андреевна", "1819–1882, Верхний Изрог", "mat", "https://familio.org/persons/a5e5a492-a960-43d6-8d63-45b0bd305e45", "", [], [
+                person("Кудрявцев", "Андрей Иванович", "1793, Верхний Изрог", "pat", "https://familio.org/persons/c3dad68d-94b3-437b-85a2-b1436688e322", "", [], [
+                  person("Кудрявцев", "Иван Деевич", "1777–1800, Верхний Изрог", "pat", "https://familio.org/persons/c5376667-4f93-4f5f-ab6c-c828d2de90c9", "Родители скрыты.", []),
+                  person("Кудрявцева (Мальцева)", "Евдокия Яковлевна", "1775, Теряевка", "mat", "https://familio.org/persons/bb9d9aa6-ccef-4853-b62c-4d8dc087c6b6", "Родители не указаны.", [])
+                ]),
+                person("Кудрявцева (Кудрявцева)", "Федосья Анисимовна", "около 1797, Верхний Изрог", "mat", "https://familio.org/persons/51bb7f6d-134c-4083-9715-f04464344b72", "Отец скрыт.", [], [
+                  person("Кудрявцева (Бакулина)", "Евдокия Андреевна", "1770, Новоселки", "mat", "https://familio.org/persons/6c6950c2-0cff-41aa-b234-228d5f566f87", "Родители не указаны. Муж скрыт.", [])
+                ])
+              ])
+            ])
+          ]),
+          person("Ходырева (Киселева)", "Анастасия Константиновна", "1883, село Кислино", "mat", "https://familio.org/persons/8b70b4eb-cdff-4c1e-8807-7497fec81459", "Родители не указаны.", [])
+        ]),
+        person("Ходырева", "Наталья Ивановна", "1911–1994, Новое Перевесово", "mat", "https://familio.org/persons/e1a5c89a-4ab4-4060-a1c6-9be36f33c07d", "Девичья фамилия тоже Ходырева.", [
+          sib("Ходырев", "Сергей Иванович", "1909", "https://familio.org/persons/5bff190d-ff22-4c89-96d4-a4c444fc5ef7"),
+          sib("Ходырева", "Анастасия Ивановна", "1913", "https://familio.org/persons/7f6b36f9-c3b1-440c-9797-33e32d72bb39"),
+          sib("Ходырева", "Анна Ивановна", "1914", "https://familio.org/persons/fef3b973-51df-469c-b405-d33834eea993"),
+          sib("Ходырева", "Елена Ивановна", "1916", "https://familio.org/persons/99b5384a-0ed1-44e5-8274-33aa48a65712"),
+          sib("Ходырева", "Надежда Ивановна", "1918", "https://familio.org/persons/7cd3df6e-8ebc-4679-80f3-147e87a8796f")
+        ], [
+          person("Ходырев", "Иван Григорьевич", "1883, Новое Перевесово", "pat", "https://familio.org/persons/7edeca2c-43ce-4ebf-a68e-8d364a9b6b85", "Отец не указан. К детям Григория Ефимовича не отнесён.", [], [
+            person("Ходырева (Шипилова)", "Евдокия Петровна", "1845, Новое Перевесово", "mat", "https://familio.org/persons/9f4bff5d-244a-46de-bd3d-75b83c427884", "Муж Василий Кириллович умер в 1873 году, до рождения Ивана. Отцом Ивана он не указан.", [], [
+              person("Шипилов", "Пётр Михайлович", "1817, Новое Перевесово", "pat", "https://familio.org/persons/6ffdc484-e8c5-4668-9d9c-181758b5f5e1", "", [], [
+                person("Шипилов", "Михаил Иванович", "1798–1848, Новое Перевесово", "pat", "https://familio.org/persons/9fc3ae29-308b-4d9f-985a-47fec6fdeb35", "", [], [
+                  person("Шипилов", "Иван Ильич", "1779, Новое Перевесово", "pat", "https://familio.org/persons/07a0eacd-2bb9-48aa-b329-aae9100d2020", "Родители скрыты.", []),
+                  person("Шипилова", "Марфа Васильевна", "1780, умерла до 1850", "mat", "https://familio.org/persons/48b6792c-78aa-4571-8874-a54ac7ade592", "Родители не указаны.", [])
+                ]),
+                person("Шипилова", "Марфа Никифоровна", "1806", "mat", "https://familio.org/persons/32cd8246-8d15-49dc-9ab2-75139badcd95", "Родители не указаны.", [])
+              ]),
+              person("Шипилова (Шевякова)", "Ольга Мефодиевна", "1820–16.01.1865, Богово", "mat", "https://familio.org/persons/fbc59a31-b6ce-4115-ba85-16e80741ca2a", "", [], [
+                person("Шевяков", "Мефодий Иванович", "14.06.1801–02.07.1824, Богово", "pat", "https://familio.org/persons/2f83fa83-d485-4a68-9ae9-47507c24dc90", "", [], [
+                  person("Шевяков", "Иван Иванович", "1781–1852, Богово", "pat", "https://familio.org/persons/0fc93a1a-1798-4766-86c8-89e8e5753481", "Родители скрыты.", []),
+                  person("Шевякова", "Агриппина Ивановна", "1782", "mat", "https://familio.org/persons/de303048-fe7f-47c9-98c0-8742866f0087", "Родители не указаны.", [])
+                ]),
+                person("Шевякова (Степанова)", "Акулина Фадеевна", "1799", "mat", "https://familio.org/persons/3dc689e5-10c2-493b-920e-14decf9857dc", "Родители не указаны.", [])
+              ])
+            ])
+          ]),
+          person("Ходырева (Зайцева)", "Мария Платоновна", "1885, село Закопы", "mat", "https://familio.org/persons/1cc30e2a-ab12-4b3e-a783-2adb3a6606e9", "Родители не указаны. Отец по отчеству — Платон.", [])
+        ])
+      ])
+    ]),
+    person("Демченко", "Руслана Валерьевна", "06.03.1974, пгт Славгород", "mat", "", "", [], [
+      person("Демченко", "Валерий Леонидович", "Славгород", "pat", "", "", [
+        sib("Демченко", "Игорь Леонидович", "дети: Ольга и Алексей", ""),
+        sib("Демченко", "Людмила Леонидовна", "дочь: Яна", "")
+      ], [
+        person("Демченко", "Леонид", "отчество неизвестно", "pat", "", "Годы не известны.", []),
+        person("Демченко", "Мария", "девичья фамилия неизвестна", "mat", "", "Имя точное. Годы не известны.", [])
+      ]),
+      person("Демченко (Гузий)", "Надежда Викторовна", "Славгород", "mat", "", "", [], [
+        person("Гузий", "Виктор Юхимович", "Славгород", "pat", "", "", [], [
+          person("Гузий", "Юхим (Ефим)", "отец Виктора", "pat", "", "Годы и отчество не известны.", [])
+        ]),
+        person("Гузий (Коровкина)", "Лидия Степановна", "Славгород", "mat", "", "", [
+          sib("Коровкин", "Николай Степанович", "03.01.1925, вероятный брат", "https://pamyat-naroda.ru/heroes/person-hero85388780/", "nikolai")
+        ], [
+          person("Коровкин", "Степан Петрович", "1898, Славгород", "war", "https://pamyat-naroda.ru/heroes/person-hero36952476/", "Отец по отчеству — Пётр, карточки нет.", [], [], "stepan"),
+          person("Химка", "мать Лидии", "Евфимия или Юхимия", "mat", "", "Фамилия и годы не известны.", [])
+        ])
+      ])
+    ])
+  ]
+);
+
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c];
+  });
+}
+function surHtml(surname, url, self) {
+  if (!url) return '<div class="sur">' + esc(surname) + "</div>";
+  return '<a class="sur" href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(surname) + "</a>";
+}
+function card(p) {
+  let actions = "";
+  if (p.sibs.length) {
+    const items = p.sibs.map(function (s) {
+      const name = s.url
+        ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.surname) + "</a>"
+        : esc(s.surname);
+      const warBtn = s.war ? ' <button type="button" data-war="' + esc(s.war) + '">служба</button>' : "";
+      return '<div class="sib"><b>' + name + "</b><br>" + esc(s.given) + "<br>" + esc(s.meta) + warBtn + "</div>";
+    }).join("");
+    actions += '<details class="sibs"><summary>братья и сёстры, ' + p.sibs.length + "</summary><div class=\"sib-list\">" + items + "</div></details>";
+  }
+  if (p.war) actions += '<button type="button" data-war="' + esc(p.war) + '">служба</button>';
+  const note = p.note ? '<div class="note">' + esc(p.note) + "</div>" : "";
+  const act = actions ? '<div class="actions">' + actions + "</div>" : "";
+  return '<div class="card ' + p.kind + '">' + surHtml(p.surname, p.url) +
+    '<div class="given">' + esc(p.given) + "</div>" +
+    '<div class="meta">' + esc(p.meta) + "</div>" + note + act + "</div>";
+}
+function render(p) {
+  let tail = "";
+  if (p.parents.length === 1) {
+    tail = '<div class="anc-line"></div>' + render(p.parents[0]);
+  } else if (p.parents.length === 2) {
+    tail = '<div class="anc-line"></div><div class="pair">' +
+      '<div class="prow">' + render(p.parents[0]) + "</div>" +
+      '<div class="prow">' + render(p.parents[1]) + "</div></div>";
+  }
+  return '<div class="node">' + card(p) + tail + "</div>";
+}
+
+document.getElementById("canvas").innerHTML = render(tree);
+
+const canvas = document.getElementById("canvas");
+let zoom = 1;
+function applyZoom() {
+  canvas.style.transform = "scale(" + zoom + ")";
+}
+document.getElementById("zoom-in").onclick = function () { zoom = Math.min(1.6, zoom + 0.1); applyZoom(); };
+document.getElementById("zoom-out").onclick = function () { zoom = Math.max(0.45, zoom - 0.1); applyZoom(); };
+document.getElementById("zoom-reset").onclick = function () { zoom = 1; applyZoom(); };
+
+let sibsOpen = false;
+document.getElementById("toggle-sibs").onclick = function () {
+  sibsOpen = !sibsOpen;
+  document.querySelectorAll("details.sibs").forEach(function (d) { d.open = sibsOpen; });
+  this.textContent = sibsOpen ? "Скрыть братьев и сестёр" : "Братья и сёстры";
+};
+
+const dlg = document.getElementById("war");
+document.getElementById("canvas").addEventListener("click", function (e) {
+  const b = e.target.closest("[data-war]");
+  if (!b) return;
+  const w = wars[b.getAttribute("data-war")];
+  document.getElementById("war-title").textContent = w.title;
+  document.getElementById("war-body").innerHTML = w.html;
+  dlg.showModal();
+});
+document.getElementById("war-close").onclick = function () { dlg.close(); };
+</script>
 </body>
 </html>
