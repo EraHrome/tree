@@ -92,10 +92,20 @@
   .card.mat { background: var(--mat); border-color: var(--mat-edge); }
   .card.self { background: var(--self); border-color: var(--self); color: #fff; }
   .card.war { background: var(--war); border-color: var(--war-edge); }
+  .card.has-info { cursor: pointer; }
+  .card.has-info:hover { box-shadow: 0 4px 14px rgba(60, 40, 20, 0.12); }
   .card .sur { font-weight: 700; font-size: 14px; line-height: 1.25; }
   .card a.sur { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
   .card.self a.sur { color: #d6e6ff; }
   .card .given, .card .meta, .card .note { font-size: 12px; line-height: 1.35; color: var(--muted); margin-top: 2px; }
+  .place {
+    display: inline-block;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #efe4d2;
+    color: #5c4028;
+    font-weight: 650;
+  }
   .card.self .given, .card.self .meta, .card.self .note { color: rgba(255,255,255,0.88); }
   .card .actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
   .card button, .card summary {
@@ -124,7 +134,9 @@
   .legend { display: flex; gap: 10px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
   .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; border: 2px solid; }
   dialog {
-    width: min(640px, calc(100% - 32px));
+    width: min(860px, calc(100% - 32px));
+    max-height: 90vh;
+    overflow: auto;
     border: none;
     border-radius: 14px;
     padding: 22px 24px 18px;
@@ -136,6 +148,16 @@
   dialog h3 { margin: 16px 0 4px; font-size: 14px; }
   dialog p { margin: 0 0 6px; font-size: 14px; line-height: 1.45; }
   dialog a { color: var(--link); }
+  dialog img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 8px 0 4px;
+    border: 1px solid #e0d5c6;
+    border-radius: 8px;
+    background: #fff;
+  }
+  dialog .shot { color: var(--muted); font-size: 12px; }
   dialog menu { margin: 16px 0 0; padding: 0; text-align: right; }
 </style>
 </head>
@@ -143,7 +165,7 @@
 <header>
   <div>
     <h1>Родословная Полковниковых</h1>
-    <p>Слева вы, справа предки. Синяя фамилия подчёркнута — карточку можно открыть. В скобках девичья фамилия.</p>
+    <p>Слева вы, справа предки. Карточку с описанием можно открыть кликом — там текст и снимки. Синяя фамилия — внешняя ссылка. В скобках девичья фамилия.</p>
   </div>
   <div class="legend">
     <span><i class="sw" style="background:var(--pat);border-color:var(--pat-edge)"></i>по отцу</span>
@@ -218,6 +240,36 @@ const wars = {
       <a href="https://pamyat-naroda.ru/heroes/podvig-chelovek_nagrazhdenie10682946/" target="_blank" rel="noopener">Медаль «За отвагу»</a><br>
       <a href="https://pamyat-naroda.ru/heroes/podvig-chelovek_nagrazhdenie16499385/" target="_blank" rel="noopener">Орден Отечественной войны II степени</a><br>
       <a href="https://pamyat-naroda.ru/heroes/podvig-chelovek_nagrazhdenie46641964/" target="_blank" rel="noopener">Медаль «За боевые заслуги»</a></p>`
+  },
+  filipp: {
+    title: "Зотов Филипп Нефедов",
+    html: `
+      <h3>Кто это</h3>
+      <p>Отец Натальи Филипповны Зотовой и Петра Филипповича Зотова. В метрической книге записан как крестьянин деревни Кобылинка Филипп Нефедов Зотов, православного исповедания. Отчество по отцу — Нефед: в записи стоит «Нефедов».</p>
+      <h3>Место</h3>
+      <p>Деревня Кобылинка, приход села Благодать (Ивановское), Ефремовский уезд Тульской губернии. Позже Октябрьский район; ныне деревня Кытино Ефремовского округа.</p>
+      <h3>Семья</h3>
+      <p>Законная жена — Дария Ильина, урождённая Затевахина. Оба православного исповедания.</p>
+      <h3>Документ</h3>
+      <p>Метрическая книга на 1908 год, часть первая, о родившихся. В записи о ребёнке (родился 15-го, крещён 16-го) родители: деревни Кобылинки крестьянин Филипп Нефедов Зотов и законная жена его Дария Ильина.</p>
+      <p class="shot">Увеличенная запись</p>
+      <img src="img/metric-1908-entry.jpg" alt="Запись: Филипп Нефедов Зотов и Дария Ильина">
+      <p class="shot">Разворот метрической книги, 1908 год</p>
+      <img src="img/metric-1908-spread.jpg" alt="Разворот метрической книги 1908 года">`
+  },
+  daria: {
+    title: "Зотова (Затевахина) Дария Ильина",
+    html: `
+      <h3>Кто это</h3>
+      <p>Мать Натальи Филипповны Зотовой и Петра Филипповича Зотова. В метрике — Дария Ильина, законная жена крестьянина Филиппа Нефедова Зотова. Девичья фамилия — Затевахина.</p>
+      <h3>Дата и место</h3>
+      <p>Родилась 15 сентября 1903 года. Деревня Кобылинка, приход села Благодать (Ивановское), Ефремовский уезд Тульской губернии. Ныне деревня Кытино Ефремовского округа.</p>
+      <h3>Документ</h3>
+      <p>Метрическая книга на 1908 год, часть первая, о родившихся. В записи о ребёнке (родился 15-го, крещён 16-го) она уже стоит законной женой: деревни Кобылинки крестьянин Филипп Нефедов Зотов и законная жена его Дария Ильина, оба православного исповедания.</p>
+      <p class="shot">Увеличенная запись</p>
+      <img src="img/metric-1908-entry.jpg" alt="Запись: Филипп Нефедов Зотов и Дария Ильина">
+      <p class="shot">Разворот метрической книги, 1908 год</p>
+      <img src="img/metric-1908-spread.jpg" alt="Разворот метрической книги 1908 года">`
   }
 };
 
@@ -244,7 +296,8 @@ const tree = person(
         person("Полковникова (Зотова)", "Наталья Филипповна", "", "mat", "", "", [
           sib("Зотов", "Пётр Филиппович", "1909, Кобылинка; брат Натальи; воевал", "https://pamyat-naroda.ru/heroes/person-hero30651729/", "petr")
         ], [
-          person("Зотов", "Филипп", "", "pat", "", "", [])
+          person("Зотов", "Филипп Нефедов", "д. Кобылинка", "pat", "", "", [], [], "filipp"),
+          person("Зотова (Затевахина)", "Дария Ильина", "15.09.1903, д. Кобылинка", "mat", "", "", [], [], "daria")
         ])
       ]),
       person("Полковникова (Ходырева)", "Анна Александровна", "1938–24.02.2025, Новое Перевесово", "mat", "https://familio.org/persons/8b0676ac-799b-4c21-8b22-4ac1d13f1610", "", [
@@ -344,6 +397,9 @@ function surHtml(surname, url, self) {
   if (!url) return '<div class="sur">' + esc(surname) + "</div>";
   return '<a class="sur" href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(surname) + "</a>";
 }
+function markPlace(text) {
+  return esc(text).replace(/д\.\s*Кобылинка|Кобылинка/g, '<span class="place">$&</span>');
+}
 function card(p) {
   let actions = "";
   if (p.sibs.length) {
@@ -351,17 +407,22 @@ function card(p) {
       const name = s.url
         ? '<a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.surname) + "</a>"
         : esc(s.surname);
-      const warBtn = s.war ? ' <button type="button" data-war="' + esc(s.war) + '">служба</button>' : "";
-      return '<div class="sib"><b>' + name + "</b><br>" + esc(s.given) + "<br>" + esc(s.meta) + warBtn + "</div>";
+      const warBtn = s.war ? ' <button type="button" data-info="' + esc(s.war) + '">служба</button>' : "";
+      return '<div class="sib"><b>' + name + "</b><br>" + esc(s.given) + "<br>" + markPlace(s.meta) + warBtn + "</div>";
     }).join("");
     actions += '<details class="sibs" open><summary>братья и сёстры, ' + p.sibs.length + "</summary><div class=\"sib-list\">" + items + "</div></details>";
   }
-  if (p.war) actions += '<button type="button" data-war="' + esc(p.war) + '">служба</button>';
+  if (p.war) {
+    const label = wars[p.war] && /служба|наград|войн/i.test(wars[p.war].html) ? "служба" : "запись";
+    actions += '<button type="button" data-info="' + esc(p.war) + '">' + label + "</button>";
+  }
   const note = p.note ? '<div class="note">' + esc(p.note) + "</div>" : "";
   const act = actions ? '<div class="actions">' + actions + "</div>" : "";
-  return '<div class="card ' + p.kind + '">' + surHtml(p.surname, p.url) +
+  const cls = "card " + p.kind + (p.war ? " has-info" : "");
+  const data = p.war ? ' data-info="' + esc(p.war) + '"' : "";
+  return '<div class="' + cls + '"' + data + ">" + surHtml(p.surname, p.url) +
     '<div class="given">' + esc(p.given) + "</div>" +
-    '<div class="meta">' + esc(p.meta) + "</div>" + note + act + "</div>";
+    '<div class="meta">' + markPlace(p.meta) + "</div>" + note + act + "</div>";
 }
 function render(p) {
   let tail = "";
@@ -394,13 +455,22 @@ document.getElementById("toggle-sibs").onclick = function () {
 };
 
 const dlg = document.getElementById("war");
-document.getElementById("canvas").addEventListener("click", function (e) {
-  const b = e.target.closest("[data-war]");
-  if (!b) return;
-  const w = wars[b.getAttribute("data-war")];
+function openInfo(key) {
+  const w = wars[key];
+  if (!w) return;
   document.getElementById("war-title").textContent = w.title;
   document.getElementById("war-body").innerHTML = w.html;
   dlg.showModal();
+}
+document.getElementById("canvas").addEventListener("click", function (e) {
+  if (e.target.closest("a, summary, details.sibs")) {
+    const b = e.target.closest("[data-info]");
+    if (b && e.target.closest("button")) openInfo(b.getAttribute("data-info"));
+    return;
+  }
+  const el = e.target.closest("[data-info]");
+  if (!el) return;
+  openInfo(el.getAttribute("data-info"));
 });
 document.getElementById("war-close").onclick = function () { dlg.close(); };
 </script>
